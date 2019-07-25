@@ -19,6 +19,9 @@ Vagrant.configure("2") do |config|
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
     apt-get update
-    apt-get install python3.7 python3.7-venv python3-venv python3-pip -y
+    apt-get install python3.7 python3.7-venv python3-venv python3-pip mongodb -y
+    sudo systemctl enable mongodb
+    cd ~/flask
+    ./setup.sh
   SHELL
 end
