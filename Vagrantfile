@@ -3,7 +3,6 @@
 
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/bionic64"
-  config.vm.network "forwarded_port", guest: 3333, guest_ip:"127.0.0.1", host: 5555, host_ip: "127.0.0.1"
   config.vm.network "private_network", ip: "192.168.33.109"
   config.vm.synced_folder "./", "/home/vagrant/flask"
 
