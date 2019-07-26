@@ -1,0 +1,11 @@
+{
+  "MONGODB_SETTINGS": {
+    "host": "mongodb://localhost:27017/storystation",
+    "db": "storystation"
+  },
+  "core": {
+    "pwd_salt": "7|-|00 4|23 54|_7, \\/3|2`/ |_337 54|_7.",
+    "secret": "\\x8c\\x8cYv\\xbc\\xbcI\\x1d\"\\xf6?\\x16Yly\\xefmI\\xbf\\xady\\xb1-\\x99",
+    "BCRYPT_LOG_ROUNDS": "13"
+  }
+}

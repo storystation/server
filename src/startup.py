@@ -1,20 +1,17 @@
-from flask import Flask, request
+from flask import Flask
 from flask_mongoengine import MongoEngine
+
 from Controller.UsersController import UsersController
+from Routes import Auth
 
 app = Flask(__name__)
-app.config['MONGODB_SETTINGS'] = {
-    "host": "mongodb://localhost:27007/storystation",
-    "db": "storystation",
-}
+app.config.from_json('config_default.json')
+app.config.from_json('config_user.cfg', True)
 db = MongoEngine(app)
+
+app.register_blueprint(Auth.bp)
 
 
 @app.route('/')
 def hello_world():
     return UsersController.show()
-
-
-@app.route('/', methods=['POST'])
-def create_user():
-    return UsersController.store(req=request)
