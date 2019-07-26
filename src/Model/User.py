@@ -12,3 +12,4 @@ class User(me.Document):
     password = me.StringField(required=True)
     tokens = me.EmbeddedDocumentListField(UserToken)
     username = me.StringField(required=True)
+    created_at = me.DateTimeField(required=True)
