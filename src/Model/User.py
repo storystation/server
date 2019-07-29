@@ -1,15 +1,9 @@
 import mongoengine as me
 
 
-class UserToken(me.EmbeddedDocument):
-    token = me.StringField(required=True)
-    issue = me.DateTimeField(required=True)
-    lifetime = me.IntField(required=True)
-
-
 class User(me.Document):
-    email = me.EmailField(required=True)
+    email = me.EmailField(required=True, unique=True)
     password = me.StringField(required=True)
-    tokens = me.EmbeddedDocumentListField(UserToken)
-    username = me.StringField(required=True)
+    tokens = me.ListField(null=False)
+    username = me.StringField(required=True, unique=True)
     created_at = me.DateTimeField(required=True)

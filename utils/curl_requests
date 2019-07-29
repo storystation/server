@@ -1,0 +1,5 @@
+Register:
+curl -X POST -d '{"username":"jean-marc","email":"jean@marc.com", "password":"1234"}' -H 'content-type:application/json' http://192.168.33.109:3333/auth/register
+
+Logon:
+curl -X POST -H 'content-type:application/json' -d '{"login": "jean-marc", "password": "1234"}' http://192.168.33.109:3333/auth/logon
