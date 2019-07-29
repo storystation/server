@@ -7,6 +7,6 @@ After=network.service storystation-mongo.service
 Type=simple
 User=vagrant
 Restart=always
-WorkingDirectory=/home/vagrant/flask/
+WorkingDirectory=/home/vagrant/flask
 ExecStartPre=/usr/bin/sh setup.sh
 ExecStart=/usr/bin/sh run.sh

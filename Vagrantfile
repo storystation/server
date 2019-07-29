@@ -38,49 +38,49 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     echo "Povisioning the box, this will take a long time, be patient."
     echo "Installing packages..."
-    yum list update > /dev/null 2>&1
-    yum check-update > /dev/null 2>&1
-    yum groupinstall -y "Development Tools" > /dev/null 2>&1
-    yum install -y yum-utils vim sqlite-devel xz xz-devel \
-      findutils bzip2 bzip2-devel expat-devel readline-devel \
-      sqlite libffi-devel libcurl-devel gettext-devel openssl-devel \
-      perl-CPAN perl-devel zlib-devel wget > /dev/null 2>&1
+      yum list update > /dev/null 2>&1
+      yum check-update > /dev/null 2>&1
+      yum groupinstall -y "Development Tools" > /dev/null 2>&1
+      yum install -y yum-utils vim sqlite-devel xz xz-devel \
+        findutils bzip2 bzip2-devel expat-devel readline-devel \
+        sqlite libffi-devel libcurl-devel gettext-devel openssl-devel \
+        perl-CPAN perl-devel zlib-devel wget > /dev/null 2>&1
     echo "Installing git..."
-    wget https://quentinbouvier.fr/files/git_2.23.0_centos.tar.gz > /dev/null 2>&1
-    tar zxf /home/vagrant/git_2.23.0_centos.tar.gz -C /usr/local/bin > /dev/null
-    rm /home/vagrant/git_2.23.0_centos.tar.gz> /dev/null
+      wget https://quentinbouvier.fr/files/git_2.23.0_centos.tar.gz > /dev/null 2>&1
+      tar zxf /home/vagrant/git_2.23.0_centos.tar.gz -C /usr/local/bin > /dev/null
+      rm /home/vagrant/git_2.23.0_centos.tar.gz> /dev/null
     echo "Installing python..."
-    sudo -u vagrant git clone https://github.com/pyenv/pyenv.git /home/vagrant/.pyenv > /dev/null 2>&1
-    echo "export PATH=\\"\\$HOME/.pyenv/bin:\\$PATH\\"" >> /home/vagrant/.bashrc
-    echo "eval \\"\\$(pyenv init -)\\"" >> /home/vagrant/.bashrc
-    PYENV_PATH=/home/vagrant/.pyenv/bin
-    $PYENV_PATH/pyenv init > /dev/null 2>&1
-    wget https://quentinbouvier.fr/files/python_3.7.4_centos7.tar.gz > /dev/null 2>&1
-    sudo -u vagrant mkdir /home/vagrant/.pyenv/versions/
-    tar xfz python_3.7.4_centos7.tar.gz -C /home/vagrant/.pyenv/versions > /dev/null
-    rm python_3.7.4_centos7.tar.gz > /dev/null
-    chown -R vagrant:vagrant /home/vagrant/.pyenv/versions/
-    chmod 755 /home/vagrant/.pyenv/versions/3.7.4
-    sudo -u vagrant $PYENV_PATH/pyenv global 3.7.4
+      sudo -u vagrant git clone https://github.com/pyenv/pyenv.git /home/vagrant/.pyenv > /dev/null 2>&1
+      echo "export PATH=\\"\\$HOME/.pyenv/bin:\\$PATH\\"" >> /home/vagrant/.bashrc
+      echo "eval \\"\\$(pyenv init -)\\"" >> /home/vagrant/.bashrc
+      PYENV_PATH=/home/vagrant/.pyenv/bin
+      $PYENV_PATH/pyenv init > /dev/null 2>&1
+      wget https://quentinbouvier.fr/files/python_3.7.4_centos7.tar.gz > /dev/null 2>&1
+      sudo -u vagrant mkdir /home/vagrant/.pyenv/versions/
+      tar xfz python_3.7.4_centos7.tar.gz -C /home/vagrant/.pyenv/versions > /dev/null
+      rm python_3.7.4_centos7.tar.gz > /dev/null
+      chown -R vagrant:vagrant /home/vagrant/.pyenv/versions/
+      chmod 755 /home/vagrant/.pyenv/versions/3.7.4
+      sudo -u vagrant $PYENV_PATH/pyenv global 3.7.4
     echo "Installing docker..."
-    (curl -fsSL https://get.docker.com/ | sudo -u vagrant sh) > /dev/null 2>&1
-    systemctl start docker
-    systemctl enable docker
-    usermod -aG docker vagrant
-    curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose > /dev/null 2>&1
-    chmod +x /usr/local/bin/docker-compose
+      (curl -fsSL https://get.docker.com/ | sudo -u vagrant sh) > /dev/null 2>&1
+      systemctl start docker > /dev/null 2>&1
+      systemctl enable docker > /dev/null 2>&1
+      usermod -aG docker vagrant
+      curl -L "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose > /dev/null 2>&1
+      chmod +x /usr/local/bin/docker-compose
     echo "Create mongo DB container..."
-    (cd /home/vagrant/flask && /usr/local/bin/docker-compose up -d) > /dev/null 2>&1
+      (cd /home/vagrant/flask && /usr/local/bin/docker-compose up -d) > /dev/null 2>&1
     echo "Installing services..."
-    cp  /home/vagrant/flask/utils/storystation-mongo.service /home/vagrant/flask/utils/storystation.service /etc/systemd/system
-    sudo chown root:root /etc/systemd/system/storystation*
-    sudo chmod 664 /etc/systemd/system/storystation*
-    systemctl enable storystation-mongo.service storystation.service
+      cp /home/vagrant/flask/utils/storystation-mongo.service /home/vagrant/flask/utils/storystation.service /etc/systemd/system
+      sudo chown root:root /etc/systemd/system/storystation*
+      sudo chmod 664 /etc/systemd/system/storystation*
+      systemctl enable storystation-mongo.service storystation.service
     echo "Starting webserver..."
-    (cd /home/vagrant/flask && echo "$(pwd)" && ./setup.sh) > /dev/null 2>&1
-    systemctl start storystation
-    # TODO: find better iptables rule, this one sucks
-    sudo iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited
+      (cd /home/vagrant/flask && echo "$(pwd)" && ./setup.sh) > /dev/null 2>&1
+      systemctl start storystation > /dev/null
+      # TODO: find better iptables rule, this one sucks
+      sudo iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited
     echo "Server successfully installed. You can now browse http://$(ip a | grep -Po "192\.168\.[0-9]{1,3}\.[0-9]{1,3}" | head -1):3333"
   SHELL
 end
