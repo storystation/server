@@ -4,6 +4,7 @@ from Controller.UsersController import UsersController
 
 app = Flask(__name__)
 app.config['MONGODB_SETTINGS'] = {
+    "host": "mongodb://localhost:27007/storystation",
     "db": "storystation",
 }
 db = MongoEngine(app)

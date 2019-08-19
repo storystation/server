@@ -1,0 +1,12 @@
+[Unit]
+Description=StoryStation database Service
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=simple
+User=root
+Restart=always
+ExecStartPre=/usr/bin/docker start storystation-mongo
+ExecStart=/usr/bin/docker attach --no-stdin storystation-mongo
+ExecStop=/usr/bin/docker stop storystation-mongo
