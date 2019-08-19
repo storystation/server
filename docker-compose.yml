@@ -1,0 +1,13 @@
+version: '3'
+services:
+    db:
+        image: 'mongo:3.6.11'
+        container_name: "storystation-mongo"
+        environment:
+            MONGO_INITDB_DATABASE: storystation
+        ports:
+            - 27007:27017
+        volumes:
+            - mongodata:/data/db
+volumes:
+    mongodata:

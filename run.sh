@@ -1,8 +1,10 @@
 #!/bin/sh
 
-. ../venv/bin/activate
+. venv/bin/activate
 
 export FLASK_APP=startup.py
 export FLASK_ENV=development
+export FLASK_BIN=/home/vagrant/.pyenv/shims
 cd src
-flask run -p 3333 -h 0.0.0.0
+echo $(pwd)
+$FLASK_BIN/flask run -p 3333 -h 0.0.0.0
