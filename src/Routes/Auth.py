@@ -4,7 +4,7 @@ from Controller import AuthController
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 
-@bp.route('/logon', methods=['POST', 'GET'])
+@bp.route('/logon', methods=['POST'])
 def logon(): return AuthController.logon(req=request)
 
 
@@ -16,5 +16,5 @@ def logout(): return AuthController.logout(req=request)
 def register(): return AuthController.store(req=request)
 
 
-@bp.route('/user')
-def user(): return AuthController.user()
+@bp.route('/details')
+def user(): return AuthController.user(req=request)
