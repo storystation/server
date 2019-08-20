@@ -1,14 +1,12 @@
-import sys
-
-from flask import (current_app as app,
-                   json, Response)
 import datetime
-import jwt
+from flask import json, Response
 from mongoengine import ValidationError, Q, NotUniqueError
 from pymongo.errors import DuplicateKeyError
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from Model.User import *
+from DTO.UserDTO import UserDTO
+from Model.User import User
+from Middleware.Auth import auth, encode_auth_token
 
 
 def store(req):
@@ -24,8 +22,10 @@ def store(req):
         new_user.tokens.append(encode_auth_token(str(new_user.id)).decode('ascii'))
         new_user.save()
         del new_user.password
-    except (KeyError, ValidationError) as e:
+    except ValidationError as e:
         error.append(str(e))
+    except KeyError as e:
+        error.append("Missing key in request body : {}".format(e))
     except (DuplicateKeyError, NotUniqueError) as e:
         email_exists = User.objects(email=data['email']).count()
         if email_exists > 0:
@@ -38,12 +38,13 @@ def store(req):
         return Response(json.dumps({"error": "Sent data is invalid", "message": error}), status=400,
                         headers={"content-type": "application/json"})
 
-    return Response(json.dumps(new_user), status=201, headers={"content-type": "application/json"})
+    user_response = UserDTO(new_user).__dict__
+    user_response['tokens'] = new_user.tokens
+    return Response(json.dumps(user_response), status=201, headers={"content-type": "application/json"})
 
 
 def logon(req):
     data = req.get_json()
-    error = []
     queried_user = User.objects(Q(username=data['login']) | Q(email=data['login'])).first()
     if queried_user is not None:
         if check_password_hash(queried_user.password, data['password']):
@@ -60,44 +61,13 @@ def logon(req):
                         headers={"content-type": "application/json"})
 
 
-def logout(req):
+@auth
+def logout(req, **kwargs):
     return "logout"
 
 
-def user():
-    return "User"
-
-
-def encode_auth_token(user_id):
-    """
-    Generates the Auth Token
-    :return: string
-    """
-    try:
-        payload = {
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=5),
-            'iat': datetime.datetime.utcnow(),
-            'sub': user_id
-        }
-        return jwt.encode(
-            payload,
-            app.config['CORE']['secret'],
-            algorithm='HS256'
-        )
-    except Exception as e:
-        return e
-
-
-def decode_auth_token(auth_token):
-    """
-    Decodes the auth token
-    :param auth_token:
-    :return: integer|string
-    """
-    try:
-        payload = jwt.decode(auth_token, app.config['CORE']['secret'])
-        return payload['sub']
-    except jwt.ExpiredSignatureError:
-        return 'Signature expired. Please log in again.'
-    except jwt.InvalidTokenError:
-        return 'Invalid token. Please log in again.'
+@auth
+def user(req, **kwargs):
+    user_response = UserDTO(kwargs['request_user']).__dict__
+    return Response(json.dumps(user_response), status=200,
+                    headers={"content-type": "application/json"})
