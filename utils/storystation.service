@@ -10,3 +10,6 @@ Restart=always
 WorkingDirectory=/home/vagrant/flask
 ExecStartPre=/usr/bin/sh setup.sh
 ExecStart=/usr/bin/sh run.sh
+
+[Install]
+WantedBy=multi-user.target
