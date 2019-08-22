@@ -1,4 +1,5 @@
 import datetime
+
 import jwt
 from flask import (current_app as app, Response)
 
@@ -12,6 +13,7 @@ def auth(method):
         if connected_user is not None:
             del connected_user.password
             del connected_user.tokens
+            connected_user.tokens = [req.headers.get('Authorization')]
             return method(req, request_user=connected_user)
 
         return Response("Unauthenticated", status=401)

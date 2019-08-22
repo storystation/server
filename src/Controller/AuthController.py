@@ -1,12 +1,13 @@
 import datetime
+
 from flask import json, Response
 from mongoengine import ValidationError, Q, NotUniqueError
 from pymongo.errors import DuplicateKeyError
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from DTO.UserDTO import UserDTO
-from Model.User import User
 from Middleware.Auth import auth, encode_auth_token
+from Model.User import User
 
 
 def store(req):
@@ -63,7 +64,9 @@ def logon(req):
 
 @auth
 def logout(req, **kwargs):
-    return "logout"
+    current_user = kwargs['request_user']
+    User.objects(id=current_user.id).update_one(pull__tokens=current_user.tokens[0])
+    return Response("", status=204)
 
 
 @auth
