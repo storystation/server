@@ -1,4 +1,5 @@
 import datetime
+import re
 
 import jwt
 from flask import (current_app as app, Response)
@@ -8,15 +9,15 @@ from Model.User import User
 
 def auth(method):
     def decorator(req):
-        token = req.headers.get('Authorization')
+        token = req.headers.get("Authorization")
+        token = re.sub(r"[Bb]earer ", "", token, count=1)
         connected_user = User.objects(tokens=token).first()
         if connected_user is not None:
             del connected_user.password
-            del connected_user.tokens
-            connected_user.tokens = [req.headers.get('Authorization')]
+            connected_user.tokens = [req.headers.get("Authorization")]
             return method(req, request_user=connected_user)
 
-        return Response("Unauthenticated", status=401)
+        return Response("Unauthenticated", headers={"WWW-Authenticate": "Bearer"}, status=401)
         
     return decorator
 
