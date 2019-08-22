@@ -1,6 +1,6 @@
 [Unit]
 Description=StoryStation flask api Service
-Requires=storystation-mongo.service
+Requires=storystation-mongo.service nginx.service
 After=network.service storystation-mongo.service
 
 [Service]

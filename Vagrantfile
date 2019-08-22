@@ -41,10 +41,10 @@ Vagrant.configure("2") do |config|
       yum list update > /dev/null 2>&1
       yum check-update > /dev/null 2>&1
       yum groupinstall -y "Development Tools" > /dev/null 2>&1
-      yum install -y yum-utils vim sqlite-devel xz xz-devel \
+      yum install -y yum-utils sqlite-devel xz xz-devel \
         findutils bzip2 bzip2-devel expat-devel readline-devel \
         sqlite libffi-devel libcurl-devel gettext-devel openssl-devel \
-        perl-CPAN perl-devel zlib-devel wget pwgen > /dev/null 2>&1
+        perl-CPAN perl-devel zlib-devel epel-release vim wget pwgen nginx> /dev/null 2>&1
     echo "Installing git..."
       wget https://quentinbouvier.fr/files/git_2.23.0_centos.tar.gz > /dev/null 2>&1
       tar zxf /home/vagrant/git_2.23.0_centos.tar.gz -C /usr/local/bin > /dev/null
@@ -76,6 +76,10 @@ Vagrant.configure("2") do |config|
       sudo chown root:root /etc/systemd/system/storystation*
       sudo chmod 664 /etc/systemd/system/storystation*
       systemctl enable storystation.service
+    echo "Configuring webserver"
+      cp /home/vagrant/flask/utils/nginx.conf /etc/nginx/ -f
+      systemctl enable nginx
+      systemctl restart nginx
     echo "Starting webserver..."
       (cd /home/vagrant/flask && echo "$(pwd)" && ./setup.sh) > /dev/null 2>&1
       until systemctl start storystation > /dev/null 2>&1
@@ -88,5 +92,9 @@ Vagrant.configure("2") do |config|
     echo "Server successfully installed. You can now browse http://$(ip a | grep -Po "192\.168\.[0-9]{1,3}\.[0-9]{1,3}" | head -1):3333"
   SHELL
 
-  config.vm.provision "shell", run: 'always', name: "Adjust firewall rules", inline: "iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited;systemctl start storystation"
+  config.vm.provision "shell", run: 'always', name: "Adjust firewall rules", inline: <<-SHELL
+    iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited
+    semanage permissive -a httpd_t
+    systemctl start storystation
+  SHELL
 end
