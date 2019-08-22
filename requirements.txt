@@ -2,3 +2,5 @@ Flask
 pyjwt
 flask-mongoengine
 flask-cors
+Flask-Sockets
+gunicorn
