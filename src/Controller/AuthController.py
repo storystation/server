@@ -46,21 +46,24 @@ def store(req):
 
 def logon(req):
     data = req.get_json()
-    queried_user = User.objects(Q(username=data['login']) | Q(email=data['login'])).first()
-    if queried_user is not None:
-        if check_password_hash(queried_user.password, data['password']):
-            token = encode_auth_token(str(queried_user.id)).decode('ascii')
-            queried_user.tokens.append(token)
-            queried_user.save()
-            return Response(json.dumps({"token": token}), status=200,
-                            headers={"content-type": "application/json"})
+    try:
+        queried_user = User.objects(Q(username=data['login']) | Q(email=data['login'])).first()
+        if queried_user is not None:
+            if check_password_hash(queried_user.password, data['password']):
+                token = encode_auth_token(str(queried_user.id)).decode('ascii')
+                queried_user.tokens.append(token)
+                queried_user.save()
+                return Response(json.dumps({"token": token}), status=200,
+                                headers={"content-type": "application/json"})
+            else:
+                return Response(json.dumps({"error": "Login or password is incorrect"}), status=403,
+                                headers={"content-type": "application/json"})
         else:
             return Response(json.dumps({"error": "Login or password is incorrect"}), status=403,
                             headers={"content-type": "application/json"})
-    else:
-        return Response(json.dumps({"error": "Login or password is incorrect"}), status=403,
+    except KeyError as e:
+        return Response(json.dumps({"error": "{} field is required".format(e)}), status=400,
                         headers={"content-type": "application/json"})
-
 
 @auth
 def logout(req, **kwargs):
