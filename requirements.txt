@@ -1,4 +1,4 @@
 Flask
 pyjwt
 flask-mongoengine
-flask-json
+flask-cors
