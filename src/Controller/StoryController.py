@@ -1,4 +1,5 @@
 import sys
+from DTO.StoryDTO import StoryDTO
 from Model.Story import Story, Module, ModuleResponse 
 from flask import (current_app as app, json, Response)
 from mongoengine import ValidationError, NotUniqueError
@@ -47,3 +48,13 @@ def store(req, **kwargs):
 
     return Response(str(new_story.id), status=201)
        
+
+@auth
+def liste(req, **kwargs):
+    queries_story = Story.objects(user_id=kwargs['request_user'].id)
+    stories = []
+    for s in queries_story:
+        stories.append(StoryDTO(s))
+        
+    return Response(json.dumps(stories, default=lambda x: x.__dict__), status=200,
+                    headers={"content-type": "application/json"})       
