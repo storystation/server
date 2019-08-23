@@ -58,3 +58,17 @@ def liste(req, **kwargs):
         
     return Response(json.dumps(stories, default=lambda x: x.__dict__), status=200,
                     headers={"content-type": "application/json"})       
+
+# Display a story based on the id
+def read(req, id):
+    try:
+        queries_read_story = Story.objects(id=id).first()
+        if not queries_read_story:
+            return Response(json.dumps({"message": "Resource not found"}), status=404,
+                        headers={"content-type": "application/json"}) 
+
+        return Response(json.dumps(StoryDTO(queries_read_story), default=lambda x: x.__dict__), status=200,
+                        headers={"content-type": "application/json"})
+    except ValidationError as e:
+        return Response(json.dumps({"message": e.message}), status=400,
+                        headers={"content-type": "application/json"})                                              
