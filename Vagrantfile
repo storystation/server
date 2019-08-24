@@ -82,14 +82,21 @@ Vagrant.configure("2") do |config|
       systemctl restart nginx
     echo "Starting webserver..."
       (cd /home/vagrant/flask && echo "$(pwd)" && ./setup.sh) > /dev/null 2>&1
-      until systemctl start storystation > /dev/null 2>&1
-        do
-          echo "Failed, trying again..."
-          sleep 2s
-        done
+      tries=0
+      until [ "$(systemctl is-active storystation)" = "active" ] || [ $tries -gt 7 ]
+      do
+      ((tries=tries+1))
+        echo "Trying to start server... ($tries)"
+        systemctl start storystation
+        sleep 2s
+      done
+      if [ $tries -gt 7 ]; then
+        echo "Failed to start server. Try installing the dependencies manually and run 'systemctl start storystation'"
+      else
+        echo "Server successfully started. You can now browse http://$(ip a | grep -Po "192\.168\.[0-9]{1,3}\.[0-9]{1,3}" | head -1)"
+      fi
       # TODO: find better iptables rule, this one sucks
       sudo iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited
-    echo "Server successfully installed. You can now browse http://$(ip a | grep -Po "192\.168\.[0-9]{1,3}\.[0-9]{1,3}" | head -1):3333"
   SHELL
 
   config.vm.provision "shell", run: 'always', name: "Adjust firewall rules", inline: <<-SHELL

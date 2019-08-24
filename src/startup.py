@@ -40,5 +40,5 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.DEBUG)
 
-    server = pywsgi.WSGIServer(('', 3333), app, handler_class=WebSocketHandler, log=logging.Logger)
+    server = pywsgi.WSGIServer(('127.0.0.1', 3333), app, handler_class=WebSocketHandler, log=logging.Logger)
     server.serve_forever()
