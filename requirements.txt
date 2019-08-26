@@ -2,5 +2,6 @@ Flask
 pyjwt
 flask-mongoengine
 flask-cors
-Flask-Sockets
+gevent
+gevent-websocket
 gunicorn

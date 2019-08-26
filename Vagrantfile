@@ -11,9 +11,10 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.provider "hyperv" do |v|
+    config.vagrant.plugins = [ "vagrant-sshfs" ]
     config.vm.synced_folder "./", "/home/vagrant/flask", type: "sshfs", sshfs_opts_append: "-o umask=000,uid=1000,gid=1000,allow_other,follow_symlinks"
-      # rsync__exclude: [ ".git/", ".vagrant/", "venv" ],
-      # rsync__args: ["--verbose", "--archive", "-zu"]
+    v.cpus = 1
+    v.enable_virtualization_extensions = true
   end
 
   config.vm.provider "docker" do |docker|
@@ -25,6 +26,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "shell", name: "Server setup script", inline: <<-SHELL
     echo "Provisioning the box, this will take a long time, be patient."
+      timedatectl set-timezone Europe/Paris
     echo "Installing packages..."
       yum list update > /dev/null 2>&1
       yum check-update > /dev/null 2>&1
