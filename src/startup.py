@@ -1,21 +1,23 @@
 import os
+import signal
 
+import gevent
 from flask import Flask
-from flask_mongoengine import MongoEngine
 from flask_cors import CORS
-from flask_sockets import Sockets
+from flask_mongoengine import MongoEngine
+from geventwebsocket import WebSocketServer, Resource
+from werkzeug.debug import DebuggedApplication
 
 from Routes import Auth, Story
-
+from Sockets import Game
 
 app = Flask(__name__)
 app.config.from_json('config_default.json')
 app.config.from_json('config_user.json', True)
 app.config['DEBUG'] = os.environ.get('DEBUG', False)
 cors = CORS(app, send_wildcard=True)
-sockets = Sockets(app)
-
 db = MongoEngine(app)
+greenletsPool = {}
 
 app.register_blueprint(Auth.bp)
 app.register_blueprint(Story.bp)
@@ -26,19 +28,19 @@ def hello_world():
     return "Hello, World !"
 
 
-@sockets.route('/ws/test')
-def echo_socket(socket):
-    while not socket.closed:
-        message = socket.receive()
-        socket.send(message)
-
-
 if __name__ == "__main__":
-    from gevent import pywsgi
-    from geventwebsocket.handler import WebSocketHandler
-    import logging
+    from gevent import monkey
+    monkey.patch_all()
 
-    logging.basicConfig(level=logging.DEBUG)
+    debug = 'DEBUG' in os.environ and os.environ['DEBUG'] == "True"
+    WebSocketServer(
+        ('127.0.0.1', 3333),
+        Resource([
+            ('^/ws/game', Game.GameSocketHandler),
+            ('^/.*', DebuggedApplication(app))
+        ]),
 
-    server = pywsgi.WSGIServer(('127.0.0.1', 3333), app, handler_class=WebSocketHandler, log=logging.Logger)
-    server.serve_forever()
+        debug=debug
+    ).serve_forever()
+
+    gevent.signal(signal.SIGQUIT, gevent.kill)
