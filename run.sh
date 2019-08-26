@@ -1,8 +1,6 @@
 #!/bin/sh
 
-. venv/bin/activate
-
-cd src
+VENV_BIN=/home/vagrant/flask/venv/bin
 
 if [ "$1" = "--debug" ]
 then
@@ -12,7 +10,12 @@ then
   fi
   export FLASK_ENV=development
   export DEBUG="True"
-  python startup.py
+  # gunicorn -k "geventwebsocket.gunicorn.workers.GeventWebSocketWorker" -b 127.0.0.1:3333 --reload --access-logfile "-" --log-level "debug" startup:__main__
 else
-  gunicorn -k flask_sockets.worker -b 127.0.0.1:3333 startup:app
+  echo "" > /dev/null
+  # gunicorn -k "geventwebsocket.gunicorn.workers.GeventWebSocketWorker" -b 127.0.0.1:3333 startup:app
 fi
+
+cd src
+
+$VENV_BIN/python startup.py
