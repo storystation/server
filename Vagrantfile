@@ -79,7 +79,7 @@ Vagrant.configure("2") do |config|
       ((tries=tries+1))
         echo "Trying to start server... ($tries)"
         systemctl start storystation
-        sleep 2s
+        sleep 5s
       done
       if [ $tries -gt 7 ]; then
         echo "Failed to start server. Try installing the dependencies manually and run 'systemctl start storystation' (Or maybe the 'Adjust firewall rules script will have your back')"
