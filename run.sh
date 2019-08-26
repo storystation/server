@@ -2,10 +2,6 @@
 
 . venv/bin/activate
 
-export FLASK_APP=startup.py
-export FLASK_ENV=development
-export FLASK_BIN=/home/vagrant/flask/venv/bin
-
 cd src
 
 if [ "$1" = "--debug" ]
@@ -14,6 +10,7 @@ then
     echo "Stopping systemd instance of storystation server..."
     sudo systemctl stop storystation
   fi
+  export FLASK_ENV=development
   export DEBUG="True"
   python startup.py
 else

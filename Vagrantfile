@@ -1,18 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-required_plugins = %w(vagrant-sshfs)
-
-plugins_to_install = required_plugins.select { |plugin| not Vagrant.has_plugin? plugin }
-if not plugins_to_install.empty?
-  puts "Installing plugins: #{plugins_to_install.join(' ')}"
-  if system "vagrant plugin install #{plugins_to_install.join(' ')}"
-    exec "vagrant #{ARGV.join(' ')}"
-  else
-    abort "Installation of one or more plugins has failed. Aborting."
-  end
-end
-
 Vagrant.configure("2") do |config|
   config.vm.box = "generic/centos7"
   config.vm.network "private_network", ip: "192.168.33.109"
@@ -32,7 +20,7 @@ Vagrant.configure("2") do |config|
     config.vm.synced_folder "./", "/home/vagrant/flask"
     docker.image = "centos:7"
     docker.has_ssh = true
-    docker.ports = [ "3333:3333" ]
+    docker.ports = [ "80:80" ]
   end
 
   config.vm.provision "shell", name: "Server setup script", inline: <<-SHELL
@@ -44,25 +32,26 @@ Vagrant.configure("2") do |config|
       yum install -y yum-utils sqlite-devel xz xz-devel \
         findutils bzip2 bzip2-devel expat-devel readline-devel \
         sqlite libffi-devel libcurl-devel gettext-devel openssl-devel \
-        perl-CPAN perl-devel zlib-devel epel-release vim wget pwgen nginx> /dev/null 2>&1
+        perl-CPAN perl-devel zlib-devel epel-release vim wget pwgen nginx > /dev/null 2>&1
     echo "Installing git..."
       wget https://quentinbouvier.fr/files/git_2.23.0_centos.tar.gz > /dev/null 2>&1
       tar zxf /home/vagrant/git_2.23.0_centos.tar.gz -C /usr/local/bin > /dev/null
       rm /home/vagrant/git_2.23.0_centos.tar.gz> /dev/null
-    echo "Installing python..."
+    echo "Installing python (and taking all its time)..."
       sudo -u vagrant git clone https://github.com/pyenv/pyenv.git /home/vagrant/.pyenv > /dev/null 2>&1
       echo "export PATH=\\"\\$HOME/.pyenv/bin:\\$PATH\\"" >> /home/vagrant/.bashrc
       echo "eval \\"\\$(pyenv init -)\\"" >> /home/vagrant/.bashrc
       PYENV_PATH=/home/vagrant/.pyenv/bin
-      $PYENV_PATH/pyenv init > /dev/null 2>&1
       wget https://quentinbouvier.fr/files/python_3.7.4_centos7.tar.gz > /dev/null 2>&1
-      sudo -u vagrant mkdir /home/vagrant/.pyenv/versions/
+      sudo -u vagrant mkdir /home/vagrant/.pyenv/versions/ > /dev/null 2>&1
       tar xfz python_3.7.4_centos7.tar.gz -C /home/vagrant/.pyenv/versions > /dev/null
-      rm python_3.7.4_centos7.tar.gz > /dev/null
+      rm python_3.7.4_centos7.tar.gz > /dev/null 2>&1
       chown -R vagrant:vagrant /home/vagrant/.pyenv/versions/
       chmod 755 /home/vagrant/.pyenv/versions/3.7.4
+      # sudo -u vagrant $PYENV_PATH/pyenv install 3.7.4
+      eval "$($PYENV_PATH/pyenv init -)"
       sudo -u vagrant $PYENV_PATH/pyenv global 3.7.4
-    echo "Installing docker..."
+    echo "Installing docker and docker compose..."
       (curl -fsSL https://get.docker.com/ | sudo -u vagrant sh) > /dev/null 2>&1
       systemctl start docker > /dev/null 2>&1
       systemctl enable docker > /dev/null 2>&1
@@ -71,17 +60,17 @@ Vagrant.configure("2") do |config|
       chmod +x /usr/local/bin/docker-compose
     echo "Create mongo DB container..."
       (cd /home/vagrant/flask && /usr/local/bin/docker-compose up -d) > /dev/null 2>&1
-    echo "Installing services..."
+    echo "Installing storystation as a services..."
       cp /home/vagrant/flask/utils/storystation-mongo.service /home/vagrant/flask/utils/storystation.service /etc/systemd/system
       sudo chown root:root /etc/systemd/system/storystation*
       sudo chmod 664 /etc/systemd/system/storystation*
-      systemctl enable storystation.service
+      systemctl enable storystation.service > /dev/null 2>&1
     echo "Configuring webserver"
       cp /home/vagrant/flask/utils/nginx.conf /etc/nginx/ -f
-      systemctl enable nginx
+      systemctl enable nginx > /dev/null 2>&1
       systemctl restart nginx
     echo "Starting webserver..."
-      (cd /home/vagrant/flask && echo "$(pwd)" && ./setup.sh) > /dev/null 2>&1
+      (cd /home/vagrant/flask && ./setup.sh)
       tries=0
       until [ "$(systemctl is-active storystation)" = "active" ] || [ $tries -gt 7 ]
       do
@@ -91,7 +80,7 @@ Vagrant.configure("2") do |config|
         sleep 2s
       done
       if [ $tries -gt 7 ]; then
-        echo "Failed to start server. Try installing the dependencies manually and run 'systemctl start storystation'"
+        echo "Failed to start server. Try installing the dependencies manually and run 'systemctl start storystation' (Or maybe the 'Adjust firewall rules script will have your back')"
       else
         echo "Server successfully started. You can now browse http://$(ip a | grep -Po "192\.168\.[0-9]{1,3}\.[0-9]{1,3}" | head -1)"
       fi
@@ -100,7 +89,7 @@ Vagrant.configure("2") do |config|
   SHELL
 
   config.vm.provision "shell", run: 'always', name: "Adjust firewall rules", inline: <<-SHELL
-    iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited
+    iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited > /dev/null 2>&1
     semanage permissive -a httpd_t
     systemctl start storystation
   SHELL
