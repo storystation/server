@@ -21,7 +21,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"login\": \"jean-marc2\",\n\t\"password\": \"1234\"\n}"
+							"raw": "{\n\t\"login\": \"jean-marc3\",\n\t\"password\": \"1234\"\n}"
 						},
 						"url": {
 							"raw": "{{host}}/auth/logon",
@@ -110,13 +110,167 @@
 							}
 						],
 						"url": {
-							"raw": "{{host}}/auth/details",
+							"raw": "http://{{host}}/auth/details",
+							"protocol": "http",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"auth",
 								"details"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Game",
+			"item": [
+				{
+					"name": "New",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"jean-marc3\",\n\t\"email\": \"jean3@marc.com\", \n\t\"password\": \"1234\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/game/new",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"game",
+								"new"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Story",
+			"item": [
+				{
+					"name": "Create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"character_name\": \"Toto\",\n    \"modules\": [\n        {\n            \"_id\": \"\",\n            \"position\": 0,\n            \"name\": \"Toto1\",\n            \"time_max\": 10,\n            \"win_condition\": [],\n            \"answers\": [\n                {\n                    \"text\": \"Droite\",\n                    \"destination\": 2\n                },\n                {\n                    \"text\": \"gauche\",\n                    \"destination\": 3\n                }\n            ],\n            \"response\": {\n                \"success\": \"Youpi\",\n                \"fail\": \"Oh,oh,oh,oooooh\"\n            },\n            \"description\": \"Module toto 1\",\n            \"type\": \"\"\n        }\n    ],\n    \"life\": 5,\n    \"stage\": 0,\n    \"companion_name\": \"toutou\"\n}\n"
+						},
+						"url": {
+							"raw": "{{host}}/story/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"story",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"character_name\": \"Toto\",\n    \"modules\": [\n        {\n            \"_id\": \"\",\n            \"position\": 0,\n            \"name\": \"Toto1\",\n            \"time_max\": 10,\n            \"win_condition\": [],\n            \"answers\": [\n                {\n                    \"text\": \"Droite\",\n                    \"destination\": 2\n                },\n                {\n                    \"text\": \"gauche\",\n                    \"destination\": 3\n                }\n            ],\n            \"response\": {\n                \"success\": \"Youpi\",\n                \"fail\": \"Oh,oh,oh,oooooh\"\n            },\n            \"description\": \"Module toto 1\",\n            \"type\": \"\"\n        }\n    ],\n    \"life\": 5,\n    \"stage\": 0,\n    \"companion_name\": \"toutou\"\n}\n"
+						},
+						"url": {
+							"raw": "{{host}}/story/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"story",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"character_name\": \"Toto\",\n    \"modules\": [\n        {\n            \"_id\": \"\",\n            \"position\": 0,\n            \"name\": \"Toto1\",\n            \"time_max\": 10,\n            \"win_condition\": [],\n            \"answers\": [\n                {\n                    \"text\": \"Droite\",\n                    \"destination\": 2\n                },\n                {\n                    \"text\": \"gauche\",\n                    \"destination\": 3\n                }\n            ],\n            \"response\": {\n                \"success\": \"Youpi\",\n                \"fail\": \"Oh,oh,oh,oooooh\"\n            },\n            \"description\": \"Module toto 1\",\n            \"type\": \"\"\n        }\n    ],\n    \"life\": 5,\n    \"stage\": 0,\n    \"companion_name\": \"toutou\"\n}\n"
+						},
+						"url": {
+							"raw": "{{host}}/story/5d65475b3034e9252600f382",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"story",
+								"5d65475b3034e9252600f382"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": "",
+									"disabled": true
+								}
 							]
 						}
 					},
