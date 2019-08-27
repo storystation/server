@@ -1,10 +1,20 @@
-from Model.Story import Story, Module, ModuleResponse
+from Model.Story import Story, Module, ModuleResponse, ModuleAnswer
 
 
 class ModuleResponseDTO:
     def __init__(self, module_response: ModuleResponse):
         self.success = module_response.success
         self.fail = module_response.fail
+
+
+class ModuleAnswerDTO:
+    def __init__(self, answer: ModuleAnswer):
+        self.text = answer.text
+        try:
+            destination = int(answer.destination)
+        except ValueError:
+            destination = 0
+        self.destination = destination
 
 
 class ModuleDTO:
@@ -14,10 +24,12 @@ class ModuleDTO:
         self.position = module.position
         self.description = module.description
         self.response = ModuleResponseDTO(module.response)
-        self.components = module.components
         self.time_max = module.time_max
         self.win_condition = module.win_condition
         self._type = module._type
+        self.answers = []
+        for a in module.answers:
+            self.answers.append(a)
 
 
 class StoryDTO:
@@ -28,6 +40,5 @@ class StoryDTO:
         self.modules = []
         for m in story.modules:
             self.modules.append(ModuleDTO(m))
-        self.components = story.components
         self.companion_name = story.companion_name
         self.life = story.life

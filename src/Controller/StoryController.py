@@ -4,7 +4,7 @@ from mongoengine import ValidationError
 
 from DTO.StoryDTO import StoryDTO
 from Middleware.Auth import auth
-from Model.Story import Story, Module, ModuleResponse
+from Model.Story import Story, Module, ModuleResponse, ModuleAnswer
 
 
 @auth
@@ -16,24 +16,32 @@ def store(req, **kwargs):
         modules = []
         for m in data['modules']:
             rs = ModuleResponse(success=m['response']['success'], fail=m['response']['fail'])
+
+            aw = []
+            if 'answers' in m:
+                for answer in m['answers']:
+                    aw.append(ModuleAnswer(
+                        text=answer['text'],
+                        destination=answer['destination']
+                    ))
+
             mo = Module(
-                _id=ObjectId(m['_id']),
+                _id=ObjectId(),
                 name=m['name'],
                 description=m['description'],
                 response=rs,
-                components=m['components'],
                 _type=m['type'],
                 time_max=m['time_max'],
                 position=m['position'],
-                win_condition=m['win_condition'])
+                win_condition=m['win_condition'],
+                answers=aw)
             modules.append(mo)
 
         new_story = Story(user_id=ObjectId(str(kwargs['request_user'].id)),
                           character_name=data['character_name'],
                           stage=data['stage'],
-                          modules=modules.__dict__,
-                          components=data['components'],
                           companion_name=data['companion_name'],
+                          modules=modules,
                           life=data['life'])
 
         new_story.save()
