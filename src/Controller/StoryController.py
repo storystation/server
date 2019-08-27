@@ -15,7 +15,6 @@ def store(req, **kwargs):
     try:
         modules = []
         for m in data['modules']:
-            print(m)
             rs = ModuleResponse(success=m['response']['success'], fail=m['response']['fail'])
 
             aw = []
