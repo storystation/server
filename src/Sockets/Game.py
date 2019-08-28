@@ -15,16 +15,18 @@ class GameSocketHandler(WebSocketApplication):
 
         try:
             message = json.loads(message)
-            if message['type'] == 'init_module':
-                self.init_module(message)
-            elif message['type'] == 'end_module':
-                self.end_module(message)
-            elif message['type'] == 'timeout':
-                self.send_timeout(message)
-            elif message['type'] == 'is_ready':
-                self.poll_ready(message)
-            elif message['type'] == 'echo':
+            if message['type'] == 'echo':
                 self.ws.send(json.dumps(message))
+            else:
+                self.forward(message)
+            # elif message['type'] == 'init_module':
+            #     self.init_module(message)
+            # elif message['type'] == 'end_module':
+            #     self.end_module(message)
+            # elif message['type'] == 'timeout':
+            #     self.send_timeout(message)
+            # elif message['type'] == 'is_ready':
+            #     self.poll_ready(message)
 
         except KeyError as e:
             print("You must provide a key: %s" % e)
@@ -37,6 +39,11 @@ class GameSocketHandler(WebSocketApplication):
                 'target': 'board',
                 'type': 'timeout'
             })
+
+    def forward(self, message):
+        message['target'] = self.swap_user(message['sender'])
+        del message['sender']
+        self.broadcast(message)
 
     def poll_ready(self, message):
         target = ''
@@ -51,12 +58,11 @@ class GameSocketHandler(WebSocketApplication):
         })
 
     def init_module(self, message):
-        if message['sender'] == 'site':
-            response = {
-                'target': 'board',
-                'module': message['module']
-            }
-            self.broadcast(response)
+        response = {
+            'target': self.swap_user(message['sender']),
+            'module': message['module']
+        }
+        self.broadcast(response)
 
     def end_module(self, message):
         if message['sender'] == 'board':
@@ -90,3 +96,9 @@ class GameSocketHandler(WebSocketApplication):
 
     def on_close(self, reason):
         print("Someone has left the game")
+
+    def swap_user(self, sender):
+        if sender == 'site':
+            return 'board'
+        elif sender == 'board':
+            return "site"
