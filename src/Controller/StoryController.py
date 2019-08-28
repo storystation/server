@@ -38,6 +38,7 @@ def store(req, **kwargs):
             modules.append(mo)
 
         new_story = Story(user_id=ObjectId(str(kwargs['request_user'].id)),
+                          title=data['title'],
                           character_name=data['character_name'],
                           stage=data['stage'],
                           companion_name=data['companion_name'],
@@ -80,3 +81,4 @@ def read(req, id):
     except ValidationError as e:
         return Response(json.dumps({"message": e.message}), status=400,
                         headers={"content-type": "application/json"})
+

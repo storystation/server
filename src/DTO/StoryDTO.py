@@ -29,12 +29,13 @@ class ModuleDTO:
         self._type = module._type
         self.answers = []
         for a in module.answers:
-            self.answers.append(a)
+            self.answers.append(ModuleAnswerDTO(a))
 
 
 class StoryDTO:
     def __init__(self, story: Story):
         self.user_id = str(story.user_id)
+        self.title = story.title
         self.character_name = story.character_name
         self.stage = story.stage
         self.modules = []
