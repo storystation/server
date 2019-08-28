@@ -1,5 +1,6 @@
 Flask
 pyjwt
+bson
 flask-mongoengine
 flask-cors
 gevent
