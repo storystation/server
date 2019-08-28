@@ -25,6 +25,7 @@ class Module(me.EmbeddedDocument):
 
 class Story(me.Document):
     user_id = me.ObjectIdField(required=True)
+    title = me.StringField(required=True)
     character_name = me.StringField(required=True)
     stage = me.IntField(required=True)
     modules = me.EmbeddedDocumentListField(Module, required=True)

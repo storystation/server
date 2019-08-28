@@ -6,10 +6,6 @@ from geventwebsocket import WebSocketApplication
 
 class GameSocketHandler(WebSocketApplication):
 
-    def __init__(self, ws):
-        super().__init__(ws)
-        self.clients = {}
-
     def on_open(self):
         print("Client connected")
 
